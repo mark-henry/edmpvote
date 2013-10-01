@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+</head>
+<body>
+  <div id="header">
+    <a href="http://www.reddit.com/r/edmproduction/"><img src="http://thumbs.reddit.com/t5_2sa4x.png?v=f99241bb2fbdb8d75030ba7dfe701d73"/></a>
+  </div>
+  <div id="content">
+    {% for entry in entries %}
+      <div class="entry">
+        <span class="title"><a href="{{ entry.url }}">{{ entry.title }}</a></span> 
+        <span class="user">entry.redditname</span>
+        <div class="sc_player">
+          <object height="18" width="100%">
+            <param name="movie" value="http://player.soundcloud.com/player.swf?url={{ entry.url }}&amp;auto_play=false&amp;player_type=tiny&amp;font=Arial&amp;color=0066c" />
+            <param name="allowscriptaccess" value="always" />
+            <embed allowscriptaccess="always" height="18" src="http://player.soundcloud.com/player.swf?url={{ entry.url }}&amp;auto_play=false&amp;player_type=tiny&amp;font=Arial&amp;color=0066c" type="application/x-shockwave-flash" width="100%" />
+          </object>
+        </div>
+        {% if not votingclosed %}
+          <div class="score_links">
+            {% for score in range(1, SCORE_RANGE+1) %}
+                {% if entry.redditname in session and score == scores[entry.redditname] %}
+                  {# Highlight the link if the user has given this score to this entry #}
+                  <a class="score_link_active"
+                {% else %}
+                  <a class="score_link"
+                {% endif %}
+                href="?entrant={{ entry.redditname }}&amp;score={{ score }}">{{ score }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</body>
+</html>
+{% endautoescape %}
