@@ -1,0 +1,84 @@
+body {
+  color: #000000;
+  font-family: helvetiva, verdana, arial;
+  font-size: 12px;
+  margin: 25px 0px; 
+  padding:0px;
+  text-align: center;
+  background-image: url('http://thumbs.reddit.com/t5_2sa4x_6.png');
+}
+
+a {
+  color: #292929;
+  text-decoration: none;
+}
+
+div {
+  margin-bottom: 14px;
+}
+
+img {
+  border: 0px;
+}
+
+#content {
+  width: 500px;
+  margin: 0px auto;
+  text-align: left;
+  padding: 10px 15px 10px 15px;
+  border: 1px dashed #333;
+  background-color: #EEEEEE;
+}
+
+#header {
+  margin: 0px auto;
+  padding-bottom: 20px
+}  
+  
+.entry {
+  block: left;
+  padding-top: 10px;
+  margin-bottom: 20px;
+}
+
+.entry .title {
+  font-size: 16px;
+  clear: left
+}
+
+.entry .user {
+  font-size: 9px;
+  color: #00B4FF;
+}
+
+.entry .user::before {
+  content: "by ";
+}
+
+.score_link {
+  color: #292929;
+  padding: 5px 8px 5px 8px;
+  margin-right: 3px;
+  background: #DDDDDD;
+}
+
+.score_link_active {
+  color: #FFFFFF;
+  background: #00B4FF;
+  font-weight: bold;
+}
+
+a.score_link:hover {
+  color: #FFFFFF;
+  background: #00B4FF;
+}
+
+.sc_player {
+  height: 18px;
+  background-color: white;
+  padding: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #ccc;
+  margin-top: 5px;
+}
