@@ -23,9 +23,9 @@
         {% if not votingclosed %}
           <div class="score_links">
             {% for score in range(1, SCORE_RANGE+1) %}
-                {% if entry.redditname in session and score == scores[entry.redditname] %}
+                {% if entry.redditname in uservotes and score == uservotes[entry.redditname] %}
                   {# Highlight the link if the user has given this score to this entry #}
-                  <a class="score_link_active"
+                  <a class="score_link score_link_active"
                 {% else %}
                   <a class="score_link"
                 {% endif %}

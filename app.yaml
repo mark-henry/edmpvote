@@ -9,10 +9,10 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
-- url: /vote.*
+- url: /vote
   script: vote.application
 
-- url: /admin.*
+- url: /admin
   script: admin.application
 
 - url: /stylesheets
