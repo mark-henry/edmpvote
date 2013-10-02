@@ -12,7 +12,7 @@
     {% for entry in entries %}
       <div class="entry">
         <span class="title"><a href="{{ entry.url }}">{{ entry.title }}</a></span> 
-        <span class="user">entry.redditname</span>
+        <span class="author">{{ entry.author }}</span>
         <div class="sc_player">
           <object height="18" width="100%">
             <param name="movie" value="http://player.soundcloud.com/player.swf?url={{ entry.url }}&amp;auto_play=false&amp;player_type=tiny&amp;font=Arial&amp;color=0066c" />
@@ -23,13 +23,13 @@
         {% if not votingclosed %}
           <div class="score_links">
             {% for score in range(1, SCORE_RANGE+1) %}
-                {% if entry.redditname in uservotes and score == uservotes[entry.redditname] %}
+                {% if entry.entryid in uservotes and score == uservotes[entry.entryid] %}
                   {# Highlight the link if the user has given this score to this entry #}
                   <a class="score_link score_link_active"
                 {% else %}
                   <a class="score_link"
                 {% endif %}
-                href="?entrant={{ entry.redditname }}&amp;score={{ score }}">{{ score }}</a>
+                href="?entry={{ entry.entryid }}&amp;score={{ score }}">{{ score }}</a>
             {% endfor %}
           </div>
         {% endif %}

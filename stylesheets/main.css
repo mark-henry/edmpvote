@@ -46,12 +46,12 @@ img {
   clear: left
 }
 
-.entry .user {
+.entry .author {
   font-size: 9px;
   color: #00B4FF;
 }
 
-.entry .user::before {
+.entry .author::before {
   content: "by ";
 }
 
