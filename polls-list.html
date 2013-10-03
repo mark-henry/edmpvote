@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<!-- Polls overview page /u/mark-henry-->
+<!-- Lists all polls in database -->
+
+<html>
+<body>
+  <h2>Polls</h2>
+  <div>
+    <form action="/admin" method="get">
+      {{ polls|count }} polls
+      <input type="hidden" name="action" value="newpoll">
+      <input type="submit" value="Start a New Poll">
+    </form>
+  </div>
+  <table border="1">
+    <tr>
+      <td>Title</td><td>Entries</td><td>Voting Enabled</td>
+    </tr>
+    {% for poll in polls %}
+      <tr>
+        <td><a href="/vote?poll={{ poll.key.urlsafe() }}">{{ poll.title }}</a></td>
+        <td>{{ poll.entries|count }} entrants</td>
+        <td>{{ poll.voting_enabled }}</td>
+        {# <td>{{ poll.end_date }}</td> #}
+        <td><a href="/admin?poll={{ poll.key.urlsafe() }}">Details/Edit...</td>
+        <td>
+          {% if poll.key == default_poll_key %}
+            Default poll
+          {% else %}
+            <form action="/admin" method="get">
+              <input type="hidden" name="default" value="{{ poll.key.urlsafe() }}">
+              <input type="submit" value="Make Default Poll">
+            </form>
+          {% endif %}
+      </tr>
+    {% endfor %}
+  </table>
+<body>
+</html>

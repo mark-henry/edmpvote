@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<!-- Poll edit page by /u/mark-henry-->
+<!-- Displays details of a single poll -->
+
+<html>
+<body>
+  <a href="/admin?view=polls">&lt;&lt;Back to polls list</a>
+  <h2>Poll {{ poll.title }}</h2>
+  <div>
+    <form method="get">
+      Title:
+      <input type="hidden" name="poll" value="{{ poll.key.urlsafe() }}">
+      <input type="text" name="title" value="{{ poll.title }}">
+      <input type="submit" value="Save">
+    </form>
+  </div>
+  <form action="/admin">
+    <input type="hidden" name="poll" value="{{ poll.key.urlsafe() }}">
+    <p>Voting for this poll is currently
+      {% if poll.voting_enabled %}
+        <input type="hidden" name="voting" value="disable">
+        <b>Enabled</b>. <input type="submit" value="Disable">
+      {% else %}
+        <input type="hidden" name="voting" value="enable">
+        <b>Disabled</b>. <input type="submit" value="Enable">
+      {% endif %}
+    </p>
+  </form>
+  <p>{{ poll.entries|count }} entries</p>
+  <table border="1">
+    <tr><td>Author</td><td>URL</td></tr>
+    {% for entry in entries %}
+      <tr>
+        <td>{{ entry.author }}</td>
+        <td>{{ entry.url }}</td>
+        <td>
+          <form action="/admin" method="get">
+            <input type="hidden" name="delete" value="{{ entry.key.urlsafe() }}">
+            <input type="hidden" name="poll" value="{{ poll.key.urlsafe() }}">
+            <input type="submit" value="Delete">
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  <div>
+    <form action="/admin" onsubmit="return confirm('Are you sure you want to delete poll {{ poll.title }}? This action cannot be undone.')">
+      <br><br>Delete this poll
+      <input type="hidden" name="delete" value="{{ poll.key.urlsafe() }}">
+      <input type="submit" value="Delete">
+    </form>
+  </div>
+</body>
+</html>
