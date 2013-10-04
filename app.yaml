@@ -12,7 +12,7 @@ handlers:
 - url: /vote
   script: vote.application
 
-- url: /admin
+- url: /admin.*
   script: admin.application
 
 - url: /stylesheets
