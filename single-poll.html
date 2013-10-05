@@ -4,6 +4,7 @@
 <!-- Displays details of a single poll -->
 
 <html>
+<head><title>Edit {{ poll.title }}</title></head>
 <body>
   <a href="/admin?view=polls">&lt;&lt;Back to polls list</a>
   <h2>Poll {{ poll.title }}</h2>
@@ -12,7 +13,7 @@
       Title:
       <input type="hidden" name="poll" value="{{ poll.key.urlsafe() }}">
       <input type="text" name="title" value="{{ poll.title }}">
-      <input type="submit" value="Save">
+      <input type="submit" value="Update Title">
     </form>
   </div>
   <form action="/admin">
@@ -26,8 +27,14 @@
         <b>Disabled</b>. <input type="submit" value="Enable">
       {% endif %}
     </p>
+  </form><br>
+  <p>{{ entries|count }} entries</p>
+  <form>
+    <input type="hidden" name="poll" value="{{ poll.key.urlsafe() }}">
+    <input type="text" name="author" value="Author Name">
+    <input type="text" name="url" value="Soundcloud URL">
+    <input type="submit" value="Create New Entry">
   </form>
-  <p>{{ poll.entries|count }} entries</p>
   <table border="1">
     <tr><td>Author</td><td>URL</td></tr>
     {% for entry in entries %}
@@ -43,10 +50,34 @@
         </td>
       </tr>
     {% endfor %}
+  </table><br>
+
+  <p>Results:</p>
+  <code>
+    <pre>{{ results }}</pre>
+  </code></br>
+
+  <p>{{ ballots|count }} ballots cast</p>
+  <table border="1">
+    <tr><td></td><td>Voter ID</td><td>Ballot</td>
+    {% for ballot in ballots %}
+      <tr>
+        <td>
+          <form action="/admin" method="get">
+            <input type="hidden" name="delete" value="{{ ballot.key.urlsafe() }}">
+            <input type="hidden" name="poll" value="{{ poll.key.urlsafe() }}">
+            <input type="submit" value="Delete">
+          </form>
+        </td>
+        <td>{{ ballot.voterid }}</td>
+        <td>{{ ballot.votes }}</td>
+      </tr>
+    {% endfor %}
   </table>
+
   <div>
     <form action="/admin" onsubmit="return confirm('Are you sure you want to delete poll {{ poll.title }}? This action cannot be undone.')">
-      <br><br>Delete this poll
+      <br><br><br>Delete this poll
       <input type="hidden" name="delete" value="{{ poll.key.urlsafe() }}">
       <input type="submit" value="Delete">
     </form>

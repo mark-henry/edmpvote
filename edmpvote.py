@@ -13,6 +13,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
   extensions=['jinja2.ext.autoescape'])
 
 DEBUG_MODE = True
+SCORE_RANGE = 10
 
 def err(args):
   logging.error("\n>>DEBUG: %s" % args)
@@ -35,7 +36,6 @@ class Ballot(ndb.Model):
 class Poll(ndb.Model):
   """Models a poll containing entries and votes"""
   title = ndb.StringProperty(required=True)
-  entries = ndb.KeyProperty(kind=Entry, repeated=True)
   voting_enabled = ndb.BooleanProperty(required=True, default=False)
   end_date = ndb.DateTimeProperty()
 

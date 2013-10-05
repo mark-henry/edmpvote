@@ -4,6 +4,7 @@
 <!-- Lists all polls in database -->
 
 <html>
+<head><title>Master Polls List</title></head>
 <body>
   <h2>Polls</h2>
   <div>
@@ -15,12 +16,12 @@
   </div>
   <table border="1">
     <tr>
-      <td>Title</td><td>Entries</td><td>Voting Enabled</td>
+      <td>Title</td>{#<td>Entries</td>#}<td>Voting Enabled</td>
     </tr>
     {% for poll in polls %}
       <tr>
         <td><a href="/vote?poll={{ poll.key.urlsafe() }}">{{ poll.title }}</a></td>
-        <td>{{ poll.entries|count }} entrants</td>
+        {# <td>{{ poll.entries|count }} entrants</td> #}
         <td>{{ poll.voting_enabled }}</td>
         {# <td>{{ poll.end_date }}</td> #}
         <td><a href="/admin?poll={{ poll.key.urlsafe() }}">Details/Edit...</td>

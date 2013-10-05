@@ -7,7 +7,8 @@
 {% autoescape true %}
 <html>
 <head>
-    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+  <title>{{ poll_title }}</title>
+  <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
 </head>
 <body>
   <div id="header">
@@ -25,16 +26,16 @@
             <embed allowscriptaccess="always" height="18" src="http://player.soundcloud.com/player.swf?url={{ entry.url }}&amp;auto_play=false&amp;player_type=tiny&amp;font=Arial&amp;color=0066c" type="application/x-shockwave-flash" width="100%" />
           </object>
         </div>
-        {% if not votingclosed %}
+        {% if voting_enabled %}
           <div class="score_links">
             {% for score in range(1, SCORE_RANGE+1) %}
-                {% if entry.entryid in uservotes and score == uservotes[entry.entryid] %}
+                {% if entry.entryid in ballot and score == ballot[entry.entryid] %}
                   {# Highlight the link if the user has given this score to this entry #}
                   <a class="score_link score_link_active"
                 {% else %}
                   <a class="score_link"
                 {% endif %}
-                href="?entry={{ entry.entryid }}&amp;score={{ score }}">{{ score }}</a>
+                href="?entryid={{ entry.entryid }}&amp;score={{ score }}">{{ score }}</a>
             {% endfor %}
           </div>
         {% endif %}
