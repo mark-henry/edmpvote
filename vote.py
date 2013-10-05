@@ -90,7 +90,9 @@ class VotePage(webapp2.RequestHandler):
     }
     template = JINJA_ENVIRONMENT.get_template('vote.html')
     self.response.write(template.render(template_vars))
-    self.response.write("your id is " + getVoterID())
+
+  def noPolls(self):
+    self.response.write("No default poll specified")
 
   def get(self):
     queries = self.request.GET
@@ -100,7 +102,11 @@ class VotePage(webapp2.RequestHandler):
       poll_key = ndb.Key(urlsafe=queries['poll'])
     else:
       poll_key = getDefaultPollObject().default_poll_key
-    poll = poll_key.get()
+    if poll_key:
+      poll = poll_key.get()
+    else:
+      self.noPolls()
+      return
 
     ballot = getBallot(poll, voterid)
 
