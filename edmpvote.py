@@ -12,7 +12,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
   loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
   extensions=['jinja2.ext.autoescape'])
 
-DEBUG_MODE = True
+DEBUG_MODE = False
 SCORE_RANGE = 10
 
 def err(args):
