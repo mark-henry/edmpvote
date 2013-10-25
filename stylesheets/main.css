@@ -73,7 +73,7 @@ img {
   font-weight: bold;
 }
 
-span.score_link:hover {
+a.score_link:hover {
   color: #FFFFFF;
   background: #00B4FF;
 }
