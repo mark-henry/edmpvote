@@ -14,17 +14,6 @@ import jinja2, webapp2
 
 from edmpvote import *
 
-example_template_vars = {
-      'poll_title': 'example poll',
-      'entries': [{'entryid':'mark-henry',
-                    'title':'example title',
-                    'author':'mark-henry',
-                    'url':'http://soundcloud.com/mark-henry/cadavre-0'}],
-      'ballot': {'mark-henry':4},
-      'voting_enabled': True,
-      'SCORE_RANGE': SCORE_RANGE,
-    }
-
 def getTitle(soundcloudurl):
   '''Gets the title for SoundCloud track specified by url'''
   # Currently implemented as a ghetto API
@@ -87,6 +76,7 @@ class VotePage(webapp2.RequestHandler):
       'voting_enabled': poll.voting_enabled,
       'ballot': formatBallot(ballot),
       'SCORE_RANGE': SCORE_RANGE,
+      'poll_key': poll.key.urlsafe(),
     }
     template = JINJA_ENVIRONMENT.get_template('vote.html')
     self.response.write(template.render(template_vars))
@@ -108,14 +98,32 @@ class VotePage(webapp2.RequestHandler):
       self.noPolls()
       return
 
-    ballot = getBallot(poll, voterid)
+    self.renderPoll(poll, getBallot(poll, voterid))
 
-    # Register vote if present
+  def post(self):
+    queries = self.request.POST
+    voterid = getVoterID()
+
+    err("Received POST " + str(queries))
+
+    if not ('poll' in queries and 'entryid' in queries and 'score' in queries):
+      self.response.write(self.response.http_status_message(400))
+      return
+
+    # Load poll
+    poll_key = ndb.Key(urlsafe=queries['poll'])
+    if poll_key:
+      poll = poll_key.get()
+    else:
+      self.response.write(self.response.http_status_message(400))
+      return
+
+    # Register vote
     if poll.voting_enabled:
-      if 'entryid' in queries and 'score' in queries:
-        ballot = registerVote(ballot, queries['entryid'], queries['score'])
-
-    self.renderPoll(poll, ballot)
+      registerVote(getBallot(poll, voterid), queries['entryid'], queries['score'])
+      self.response.write(self.response.http_status_message(200))
+    else:
+      self.response.write(self.response.http_status_message(400))
 
 # Define webapp2 application
 application = webapp2.WSGIApplication([('/.*', VotePage)], debug=DEBUG_MODE)
