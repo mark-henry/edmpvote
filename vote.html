@@ -59,9 +59,9 @@
             {% for score in range(1, SCORE_RANGE+1) %}
                 {% if entry.entryid in ballot and score == ballot[entry.entryid] %}
                   {# Highlight the link if the user has given this score to this entry #}
-                  <span class="score_link score_link_active">{{ score }}</span>
+                  <a class="score_link score_link_active" href="#">{{ score }}</a>
                 {% else %}
-                  <span class="score_link">{{ score }}</span>
+                  <a class="score_link" href="#">{{ score }}</a>
                 {% endif %}
             {% endfor %}
           </div>
