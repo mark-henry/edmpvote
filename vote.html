@@ -6,18 +6,46 @@
 
 {% autoescape true %}
 <html>
+
 <head>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      // On clicking a score link
+      $(".score_link").click(function(){
+        // Change highlighting of score links
+        $(this).siblings().removeClass("score_link_active");
+        $(this).addClass("score_link_active");
+
+        var entryid = $(this).parent().siblings().filter(".author").text();
+        $.post("vote",
+          {
+            poll:"{{poll_key}}",
+            entryid:entryid,
+            score:$(this).text()
+          },
+          function(data, status) {
+            if (status != "success") {
+              alert("There was an error registering your vote. Please refresh the page and try again.");
+            }
+          });
+      });
+    });
+  </script>
   <title>{{ poll_title }}</title>
   <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
 </head>
+
 <body>
   <div id="header">
-    <a href="http://www.reddit.com/r/edmproduction/"><img src="http://thumbs.reddit.com/t5_2sa4x.png?v=f99241bb2fbdb8d75030ba7dfe701d73"/></a>
+    <a href="http://www.reddit.com/r/edmproduction/">
+      <img src="http://thumbs.reddit.com/t5_2sa4x.png?v=f99241bb2fbdb8d75030ba7dfe701d73" alt="http://www.reddit.com/r/edmproduction" />
+    </a>
   </div>
   <div id="content">
     {% for entry in entries %}
       <div class="entry">
-        <span class="title"><a href="{{ entry.url }}">{{ entry.title }}</a></span> 
+        <span class="title"><a class="entrytitle" href="{{ entry.url }}">{{ entry.title }}</a></span> 
         <span class="author">{{ entry.author }}</span>
         <div class="sc_player">
           <object height="18" width="100%">
@@ -31,16 +59,20 @@
             {% for score in range(1, SCORE_RANGE+1) %}
                 {% if entry.entryid in ballot and score == ballot[entry.entryid] %}
                   {# Highlight the link if the user has given this score to this entry #}
-                  <a class="score_link score_link_active"
+                  <span class="score_link score_link_active">{{ score }}</span>
                 {% else %}
-                  <a class="score_link"
+                  <span class="score_link">{{ score }}</span>
                 {% endif %}
-                href="?entryid={{ entry.entryid }}&amp;score={{ score }}">{{ score }}</a>
             {% endfor %}
           </div>
         {% endif %}
       </div>
     {% endfor %}
+  </div>
+  <div id="footer">
+    <img src="https://developers.google.com/appengine/images/appengine-silver-120x30.gif" alt="Powered by Google App Engine" />
+    <br>
+    <a href="http://www.reddit.com/message/compose?to=mark-henry">Report bugs to /u/mark-henry</a>
   </div>
 </body>
 </html>

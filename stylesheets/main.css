@@ -32,11 +32,16 @@ img {
 
 #header {
   margin: 0px auto;
-  padding-bottom: 20px
+  padding-bottom: 20px;
 }  
+
+#footer {
+  padding-top: 100px;
+  font-size: 10px;
+  font-style: italic;
+}
   
 .entry {
-  block: left;
   padding-top: 10px;
   margin-bottom: 20px;
 }
@@ -68,7 +73,7 @@ img {
   font-weight: bold;
 }
 
-a.score_link:hover {
+span.score_link:hover {
   color: #FFFFFF;
   background: #00B4FF;
 }
