@@ -18,14 +18,17 @@ def getTitle(soundcloudurl):
   '''Gets the title for SoundCloud track specified by url'''
   # Currently implemented as a ghetto API
   #   that strips the title from the song's page's HTML with a regex
-  res = urllib2.urlopen(soundcloudurl)
+  try:
+    res = urllib2.urlopen(soundcloudurl)
+  except urllib2.HTTPError:
+    return "Track not available"
   content = res.read().decode(encoding='UTF-8')
   pattern = '<meta content="([^<]+?)" property="og:title" />'
   match = re.search(pattern, content)
   if match:
     return match.group(1)
   else:
-    return "err"
+    return "Track not available"
 
 def getVoterID():
   '''Gets a string that identifies the voter.'''
@@ -104,7 +107,7 @@ class VotePage(webapp2.RequestHandler):
     queries = self.request.POST
     voterid = getVoterID()
 
-    err("Received POST " + str(queries))
+    #err("Received POST " + str(queries))
 
     if not ('poll' in queries and 'entryid' in queries and 'score' in queries):
       self.response.write(self.response.http_status_message(400))

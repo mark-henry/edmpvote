@@ -61,7 +61,7 @@
                   {# Highlight the link if the user has given this score to this entry #}
                   <a class="score_link score_link_active" href="#">{{ score }}</a>
                 {% else %}
-                  <a class="score_link" href="#">{{ score }}</a>
+                  <a class="score_link" href="javascript:void(0)">{{ score }}</a>
                 {% endif %}
             {% endfor %}
           </div>
