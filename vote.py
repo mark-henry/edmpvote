@@ -14,22 +14,6 @@ import jinja2, webapp2
 
 from edmpvote import *
 
-def getTitle(soundcloudurl):
-  '''Gets the title for SoundCloud track specified by url'''
-  # Currently implemented as a ghetto API
-  #   that strips the title from the song's page's HTML with a regex
-  try:
-    res = urllib2.urlopen(soundcloudurl)
-  except urllib2.HTTPError:
-    return "Track not available"
-  content = res.read().decode(encoding='UTF-8')
-  pattern = '<meta content="([^<]+?)" property="og:title" />'
-  match = re.search(pattern, content)
-  if match:
-    return match.group(1)
-  else:
-    return "Track not available"
-
 def getVoterID():
   '''Gets a string that identifies the voter.'''
   # Right now it's just their IP address
@@ -69,7 +53,6 @@ class VotePage(webapp2.RequestHandler):
   def renderPoll(self, poll, ballot):
     entries = Entry.query(ancestor=poll.key).fetch()
     for entry in entries:
-      entry.title = getTitle(entry.url)
       entry.entryid = entry.author
     random.shuffle(entries)
 

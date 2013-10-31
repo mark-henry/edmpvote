@@ -9,14 +9,26 @@
 
 <head>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="//connect.soundcloud.com/sdk.js"></script>
   <script>
     $(document).ready(function(){
+      // Load up track titles
+      SC.initialize({
+        client_id: "bc17f4f5b116521473dbe01f2d405112",
+      });
+      $(".entrytitle").each(function() {
+        var titleElement = $(this);
+        SC.get("/resolve?url=" + $(this).attr("href"),
+              function(data) { titleElement.text(data.title); });
+      });
+      
       // On clicking a score link
       $(".score_link").click(function(){
         // Change highlighting of score links
         $(this).siblings().removeClass("score_link_active");
         $(this).addClass("score_link_active");
 
+        // Send in the vote
         var entryid = $(this).parent().siblings().filter(".author").text();
         $.post("vote",
           {
@@ -45,7 +57,7 @@
   <div id="content">
     {% for entry in entries %}
       <div class="entry">
-        <span class="title"><a class="entrytitle" href="{{ entry.url }}">{{ entry.title }}</a></span> 
+        <span class="title"><a class="entrytitle" href="{{ entry.url }}">...</a></span> 
         <span class="author">{{ entry.author }}</span>
         <div class="sc_player">
           <object height="18" width="100%">
