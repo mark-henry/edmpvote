@@ -26,7 +26,7 @@ def makePollResults(entries, ballots):
     if len(votes_by_user[user]) == 0:
       score = "0"
     else:
-      score = str(sum(votes_by_user[user])/len(votes_by_user[user]))
+      score = str(sum(votes_by_user[user])/float(len(votes_by_user[user])))
     standings.append(score + " " + user)
 
   return "\n".join(sorted(standings, reverse=True))
