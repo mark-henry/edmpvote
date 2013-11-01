@@ -48,6 +48,7 @@ img {
 
 .entry .title {
   font-size: 16px;
+  margin-left:3px;
   clear: left
 }
 
@@ -62,7 +63,7 @@ img {
 
 .score_link {
   color: #292929;
-  padding: 8px 13px 8px 13px;
+  padding: 5px 13px 5px 13px;
   margin-left: 10px;
   background: #DDDDDD;
 }
