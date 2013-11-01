@@ -26,8 +26,9 @@
       // Load embedded players
       $(".sc_player").each(function() {
         SC.oEmbed($(this).attr("scurl"),
-          {iframe:false, player_type:"tiny", color:"a22"},
-          this);
+          {color:"111", theme_color:"EEE", show_playcount:false,
+           show_artwork:false, show_comments:false, buying:false,
+           sharing:false}, this);
       });
       
       // On clicking a score link
