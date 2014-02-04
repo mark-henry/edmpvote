@@ -22,6 +22,14 @@
         SC.get("/resolve?url=" + $(this).attr("href"),
               function(data) { titleElement.text(data.title); });
       });
+
+      // Load SC embedded players
+      $(".sc_player").each(function() {
+        var url = $(this).attr("scurl");
+        SC.oEmbed(url, {maxheight:177, show_playcount:false,
+          show_artwork:false, show_comments:false, buying:false,
+          sharing:false, auto_play:false}, this);
+      })
       
       // On clicking a score link
       $(".score_link").click(function(){
@@ -61,12 +69,8 @@
         <span class="title"><a class="entrytitle" href="{{ entry.url }}">...</a></span> 
         <span class="author">{{ entry.author }}</span>
 
-        <div id="{{ entry.author }}_widget"></div>
+        <div class="sc_player" scurl="{{ entry.url }}"></div>
         <script>
-          var widget_element = document.getElementById("{{ entry.author }}_widget")
-          SC.oEmbed("{{ entry.url }}", {maxheight:177, show_playcount:false,
-           show_artwork:false, show_comments:false, buying:false,
-           sharing:false, auto_play:false}, widget_element);
         </script>
 
         {% if voting_enabled %}
