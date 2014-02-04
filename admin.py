@@ -26,10 +26,16 @@ def makePollResults(entries, ballots):
     if len(votes_by_user[user]) == 0:
       score = "0"
     else:
-      score = str(sum(votes_by_user[user])/float(len(votes_by_user[user])))
+      ratio = sum(votes_by_user[user]) / float(len(votes_by_user[user]))
+      score = str(round(ratio, 2))
     standings.append(score + " " + user)
 
-  return "\n".join(sorted(standings, reverse=True))
+  sortedstandings = sorted(standings, reverse=True)
+
+  for i in range(len(sortedstandings)):
+    sortedstandings[i] = str(i+1) + ". " + sortedstandings[i]
+
+  return "\n".join(sortedstandings)
 
 
 class AdminPage(webapp2.RequestHandler):
