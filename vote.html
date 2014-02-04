@@ -22,14 +22,6 @@
         SC.get("/resolve?url=" + $(this).attr("href"),
               function(data) { titleElement.text(data.title); });
       });
-
-      // Load embedded players
-      $(".sc_player").each(function() {
-        SC.oEmbed($(this).attr("scurl"),
-          {color:"111", theme_color:"EEE", show_playcount:false,
-           show_artwork:false, show_comments:false, buying:false,
-           sharing:false}, this);
-      });
       
       // On clicking a score link
       $(".score_link").click(function(){
@@ -68,7 +60,15 @@
       <div class="entry">
         <span class="title"><a class="entrytitle" href="{{ entry.url }}">...</a></span> 
         <span class="author">{{ entry.author }}</span>
-        <div class="sc_player" scurl="{{ entry.url }}"></div>
+
+        <div id="{{ entry.author }}_widget"></div>
+        <script>
+          var widget_element = document.getElementById("{{ entry.author }}_widget")
+          SC.oEmbed("{{ entry.url }}", {maxheight:177, show_playcount:false,
+           show_artwork:false, show_comments:false, buying:false,
+           sharing:false, auto_play:false}, widget_element);
+        </script>
+
         {% if voting_enabled %}
           <div class="score_links">
             {% for score in range(1, SCORE_RANGE+1) %}
