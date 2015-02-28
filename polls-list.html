@@ -8,7 +8,7 @@
 <body>
   <h2>Polls</h2>
   <div>
-    <form action="/admin" method="get">
+    <form method="get">
       {{ polls|count }} polls
       <input type="hidden" name="action" value="newpoll">
       <input type="submit" value="Start a New Poll">
