@@ -9,6 +9,10 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+- url: /header\.png
+  static_files: header.png
+  upload: header\.ico
+
 - url: /vote
   script: vote.application
 
