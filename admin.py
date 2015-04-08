@@ -6,7 +6,7 @@ from edmpvote import *
 
 from google.appengine.ext import ndb
 
-import jinja2, webapp2
+import jinja2, webapp2, logging
 
 
 def makePollResults(entries, ballots):
@@ -18,8 +18,9 @@ def makePollResults(entries, ballots):
     votes_by_user.update({entry.author: []})
   for ballot in ballots:
     for vote in ballot.votes:
-      votes_by_user[vote.entryid].append(vote.value)
-
+      if (votes_by_user.has_key(vote.entryid)): 
+        votes_by_user[vote.entryid].append(vote.value)
+        
   # Average the scores
   standings = []
   for user in votes_by_user.keys():
@@ -57,11 +58,16 @@ class AdminPage(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('polls-list.html')
     self.response.write(template.render(template_vars))
 
-  def editPoll(self, poll_key):
-    queries = self.request.GET
+  def editPoll(self, poll_key, isPost):
+    if(isPost):
+      queries = self.request.POST
+    else:
+      queries = self.request.GET
     poll = poll_key.get()
-
+    
+    logging.info('get some editPoll')
     if 'title' in queries:
+      logging.info('editting title ' + queries['title'])
       poll.title = queries['title']
       poll.put()
     if 'voting' in queries:
@@ -80,19 +86,25 @@ class AdminPage(webapp2.RequestHandler):
     template = JINJA_ENVIRONMENT.get_template('single-poll.html')
     template_vars = {'poll':poll, 'entries':entries, 'ballots':ballots, 'results':results}
     self.response.write(template.render(template_vars))
-
+  
   def newPoll(self):
     new_poll = Poll(title='New Poll')
     new_poll.put()
-    self.editPoll(new_poll.key)
+    self.editPoll(new_poll.key, True)
 
   def get(self):
-    if 'delete' in self.request.GET:
-      ndb.Key(urlsafe=self.request.GET['delete']).delete()
-    if 'action' in self.request.GET and self.request.GET['action'] == 'newpoll':
+    self.parseRequest(self.request.GET)
+	  
+  def post(self):
+    self.parseRequest(self.request.POST)
+      
+  def parseRequest(self, queries):
+    if 'delete' in queries:
+      ndb.Key(urlsafe=queries['delete']).delete()
+    if 'action' in queries and queries['action'] == 'newpoll':
       self.newPoll()
-    elif 'poll' in self.request.GET:
-      self.editPoll(ndb.Key(urlsafe=self.request.GET['poll']))
+    elif 'poll' in queries:
+      self.editPoll(ndb.Key(urlsafe=queries['poll']), True)
     else:
       self.pollsList()
 
