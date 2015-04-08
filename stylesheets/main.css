@@ -5,7 +5,7 @@ body {
   margin: 25px 0px; 
   padding:0px;
   text-align: center;
-  background-image: url('http://thumbs.reddit.com/t5_2sa4x_6.png');
+  background-image: url('../images/background.png');
 }
 
 a {
