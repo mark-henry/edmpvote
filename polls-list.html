@@ -4,15 +4,28 @@
 <!-- Lists all polls in database -->
 
 <html>
-<head><title>Master Polls List</title></head>
+<head>
+  <title>Master Polls List</title>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+  <style type="text/css" media="screen">
+    table, th, td {
+      border: 1px solid #bbb;
+    }  
+    td {
+      padding: 5px;
+    }
+  </style>
+</head>
 <body>
   <h2>Polls</h2>
+  <br />
   <div>
     <form method="get">
       {{ polls|count }} polls
       <input type="hidden" name="action" value="newpoll">
       <input type="submit" value="Start a New Poll">
     </form>
+    <br />
   </div>
   <table border="1">
     <tr>
