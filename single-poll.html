@@ -4,7 +4,24 @@
 <!-- Displays details of a single poll -->
 
 <html>
-<head><title>Edit {{ poll.title }}</title></head>
+<head>
+  <title>Edit {{ poll.title }}</title>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+  <style type="text/css" media="screen">
+    table, th, td {
+      border: 1px solid #bbb;
+    }  
+    td {
+      padding: 5px;
+    }
+    input[type="text"] {
+      margin: 10px 0px;
+    }
+    body {
+      margin-left: 10px;
+    }
+  </style>
+</head>
 <body>
   <a href="/admin?view=polls">&lt;&lt;Back to polls list</a>
   <h2>Poll {{ poll.title }}</h2>
@@ -27,12 +44,12 @@
         <b>Disabled</b>. <input type="submit" value="Enable">
       {% endif %}
     </p>
-  </form><br>
+  </form>
   <p>{{ entries|count }} entries</p>
   <form method="post" action="">
     <input type="hidden" name="poll" value="{{ poll.key.urlsafe() }}">
-    <input type="text" name="author" value="Author Name">
-    <input type="text" name="url" value="Soundcloud URL">
+    <input type="text" name="author" placeholder="Author Name">
+    <input type="text" name="url" placeholder="Soundcloud URL">
     <input type="submit" value="Create New Entry">
   </form>
   <table border="1">
@@ -79,7 +96,7 @@
     <form method="post" action="/admin" onsubmit="return confirm('Are you sure you want to delete poll {{ poll.title }}? This action cannot be undone.')">
       <br><br><br>Delete this poll
       <input type="hidden" name="delete" value="{{ poll.key.urlsafe() }}">
-      <input type="submit" value="Delete">
+      <input type="submit" value="Delete" class="btn-danger">
     </form>
   </div>
 </body>
