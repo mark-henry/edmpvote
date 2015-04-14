@@ -42,11 +42,22 @@
           {% if poll.key == default_poll_key %}
             Default poll
           {% else %}
-            <form action="/admin" method="get">
+            <form action="/admin" method="post">
               <input type="hidden" name="default" value="{{ poll.key.urlsafe() }}">
               <input type="submit" value="Make Default Poll">
             </form>
           {% endif %}
+        </td>
+        <td>
+          {% if poll.key == receiving_poll_key %}
+            Receiving poll
+          {% else %}
+            <form action="/admin" method="post">
+              <input type="hidden" name="receiving" value="{{ poll.key.urlsafe() }}">
+              <input type="submit" value="Make Receiving Poll">
+            </form>
+          {% endif %}
+        </td>
       </tr>
     {% endfor %}
   </table>

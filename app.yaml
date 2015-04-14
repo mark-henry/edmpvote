@@ -12,6 +12,9 @@ handlers:
 - url: /vote
   script: vote.application
 
+- url: /admin/newentries
+  script: admin.application
+  
 - url: /admin.*
   script: admin.application
   login: admin

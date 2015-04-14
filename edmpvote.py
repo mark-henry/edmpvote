@@ -1,6 +1,4 @@
-# Datastore models and other common stuff
-
-__author__ = '/u/mark-henry'
+"""Datastore models and other common stuff"""
 
 import os
 import logging
@@ -8,6 +6,7 @@ import logging
 from google.appengine.ext import ndb
 
 import jinja2
+
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -50,7 +49,14 @@ class Poll(ndb.Model):
 class DefaultPoll(ndb.Model):
     """A single DefaultPoll instance contains a reference to the default poll, which is displayed
       by the vote page when no poll is specified."""
-    default_poll_key = ndb.KeyProperty(kind=Poll)
+    poll_key = ndb.KeyProperty(kind=Poll)
+
+class ReceivingPoll(ndb.Model):
+    """
+    The singleton ReceivingPoll instance object contains a reference to the
+    currently "receiving" poll, which recieves new entries from /admin/newentries.
+    """
+    poll_key = ndb.KeyProperty(kind=Poll)
 
 
 def getDefaultPollObject():
@@ -60,7 +66,20 @@ def getDefaultPollObject():
         return query_results[0]
     else:
         # Initialize the default poll object if it does not exist
-        err("initted deef poll")
         default_poll = DefaultPoll()
         default_poll.put()
         return default_poll
+
+
+def getReceivingPollObject():
+    """
+    Reutrns an object containing a reference to the currently "receiving"
+    poll (the poll that recieves new entries from /admin/newentries.)
+    """
+    query_results = ReceivingPoll.query().fetch()
+    if query_results:
+        return query_results[0]
+    else:
+        receiving_poll = ReceivingPoll()
+        receiving_poll.poll_key = getDefaultPollObject().poll_key
+        return receiving_poll

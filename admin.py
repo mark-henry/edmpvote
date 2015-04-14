@@ -38,35 +38,43 @@ def makePollResults(entries, ballots):
     return "\n".join(sortedstandings)
 
 
+def putEntry(username, url):
+    pass
+
+
 class AdminPage(webapp2.RequestHandler):
     def pollsList(self):
         # Fetch data
-        queries = self.request.GET
+        queries = self.request.POST
         default_poll_object = getDefaultPollObject()
+        receiving_poll_object = getReceivingPollObject()
         polls = Poll.query().fetch() or []
         polls.sort(reverse=True, key=lambda p: p.created or datetime.datetime.min)
 
         # Update data
         if 'default' in queries:
             # Update the default poll value
-            default_poll_object.default_poll_key = ndb.Key(urlsafe=queries['default'])
+            default_poll_object.poll_key = ndb.Key(urlsafe=queries['default'])
             default_poll_object.put()
+        if 'receiving' in queries:
+            # Update the default poll value
+            receiving_poll_object.poll_key = ndb.Key(urlsafe=queries['receiving'])
+            receiving_poll_object.put()
 
         # Render
-        template_vars = {'polls': polls, 'default_poll_key': default_poll_object.default_poll_key}
+        template_vars = {
+            'polls': polls,
+            'default_poll_key': default_poll_object.poll_key,
+            'receiving_poll_key': receiving_poll_object.poll_key
+        }
         template = JINJA_ENVIRONMENT.get_template('polls-list.html')
         self.response.write(template.render(template_vars))
 
-    def editPoll(self, poll_key, is_post):
-        if is_post:
-            queries = self.request.POST
-        else:
-            queries = self.request.GET
+    def editPoll(self, poll_key):
+        queries = self.request.POST
         poll = poll_key.get()
 
-        logging.info('get some editPoll')
         if 'title' in queries:
-            logging.info('editting title ' + queries['title'])
             poll.title = queries['title']
             poll.put()
         if 'voting' in queries:
@@ -89,7 +97,7 @@ class AdminPage(webapp2.RequestHandler):
     def newPoll(self):
         new_poll = Poll(title='New Poll')
         new_poll.put()
-        self.editPoll(new_poll.key, True)
+        self.editPoll(new_poll.key)
 
     def get(self):
         self.parseRequest(self.request.GET)
@@ -103,11 +111,25 @@ class AdminPage(webapp2.RequestHandler):
         if 'action' in queries and queries['action'] == 'newpoll':
             self.newPoll()
         elif 'poll' in queries:
-            self.editPoll(ndb.Key(urlsafe=queries['poll']), True)
+            self.editPoll(ndb.Key(urlsafe=queries['poll']))
         else:
             self.pollsList()
 
 
+class NewEntries(webapp2.RequestHandler):
+    def put(self):
+        poll_key = getReceivingPollObject().poll_key
+        payload = self.request.POST
+
+        valid_secrets = ['redditbot']
+
+        if 'author' in payload and 'url' in payload:
+            if 'secret' in payload and payload['secret'] in valid_secrets:
+                Entry(author=payload['author'], url=payload['url'], parent=poll_key).put()
+                logging.info("New entry created via PUT endpoint")
+
+
 application = webapp2.WSGIApplication(
-    [('/admin.*', AdminPage)],
+    [(r'/admin/newentries', NewEntries),
+        (r'/admin.*', AdminPage)],
     debug=DEBUG_MODE)

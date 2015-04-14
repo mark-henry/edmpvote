@@ -78,7 +78,7 @@ class VotePage(webapp2.RequestHandler):
         if 'poll' in queries:
             poll_key = ndb.Key(urlsafe=queries['poll'])
         else:
-            poll_key = getDefaultPollObject().default_poll_key
+            poll_key = getDefaultPollObject().poll_key
         if poll_key:
             poll = poll_key.get()
         else:
