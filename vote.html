@@ -8,8 +8,8 @@
 <html>
 
 <head>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script src="//connect.soundcloud.com/sdk.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="https://connect.soundcloud.com/sdk/sdk-3.1.2.js"></script>
   <script>
     $(document).ready(function(){
       SC.initialize({
@@ -19,16 +19,25 @@
       // Load track titles
       $(".entrytitle").each(function() {
         var titleElement = $(this);
-        SC.get("/resolve?url=" + $(this).attr("href"),
-              function(data) { titleElement.text(data.title); });
+        SC
+          .get("/resolve?url=" + $(this).attr("href"))
+          .then(function(track) {
+            titleElement.text(track.title);
+          });
       });
 
       // Load SC embedded players
       $(".sc_player").each(function() {
-        var url = $(this).attr("scurl");
-        SC.oEmbed(url, {maxheight:177, show_playcount:false,
-          show_artwork:false, show_comments:false, buying:false,
-          sharing:false, auto_play:false}, this);
+        var track_url = $(this).attr("scurl");
+        SC.oEmbed(track_url, {
+          maxheight:177,
+          show_playcount:false,
+          show_artwork:false,
+          show_comments:false,
+          buying:false,
+          sharing:false,
+          auto_play:false,
+          element: this});
       })
       
       // On clicking a score link
