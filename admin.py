@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 import webapp2
 import logging
 import datetime
+import re
 
 
 def makePollResults(entries, ballots):
@@ -38,8 +39,14 @@ def makePollResults(entries, ballots):
     return "\n".join(sortedstandings)
 
 
-def putEntry(username, url):
-    pass
+def parse_quickadd(quickadd):
+    url = re.search('https?:.*?(?=(\s|$))', quickadd).group(0)
+    from_match = re.search('from (\w*)', quickadd)
+    if from_match:
+        username = from_match.group(1)
+    else:
+        username = re.search('\w*', quickadd).group(0)
+    return (username, url)
 
 
 class AdminPage(webapp2.RequestHandler):
@@ -85,6 +92,10 @@ class AdminPage(webapp2.RequestHandler):
             poll.put()
         if 'author' in queries and 'url' in queries:
             Entry(author=queries['author'], url=queries['url'], parent=poll_key).put()
+        if 'quickadd' in queries:
+            author, url = parse_quickadd(queries['quickadd'])
+            if author and url:
+                Entry(author=author, url=url, parent=poll_key).put()
 
         entries = Entry.query(ancestor=poll_key).fetch()
         ballots = Ballot.query(ancestor=poll_key).fetch()
