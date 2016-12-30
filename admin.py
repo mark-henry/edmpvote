@@ -13,6 +13,9 @@ import re
 def makePollResults(entries, ballots):
     """Renders a sorted list of standings"""
 
+    # Filter out the single-entry ballots
+    ballots = filter(lambda ballot: len(ballot.votes) > 1, ballots)
+
     # Collect the votes
     votes_by_user = {}
     for entry in entries:
