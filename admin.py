@@ -108,7 +108,7 @@ class AdminPage(webapp2.RequestHandler):
     def newPoll(self):
         new_poll = Poll(title='New Poll')
         new_poll.put()
-        self.editPoll(new_poll.key)
+        return self.redirect("/admin?poll=" + new_poll.key.urlsafe())
 
     def get(self):
         self.parseRequest(self.request.GET)
