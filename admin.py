@@ -13,20 +13,30 @@ import re
 def makePollResults(entries, ballots):
     """Renders a sorted list of standings"""
 
-    # Collect the votes
+    # Filter out the single-entry ballots
+    ballots = filter(lambda ballot: len(ballot.votes) > 1, ballots)
+
+    # Group the votes by userid
     votes_by_user = {}
     for entry in entries:
         votes_by_user.update({entry.author: []})
     for ballot in ballots:
+        # Normalize each ballot values to a 1-5 scale
+        values = [vote.value for vote in ballot.votes]
+        if min(values) == max(values):
+            continue  # Ballots which express no preference do not count
+        translate = min(values)
+        scale = 4.0 / (max(values) - min(values))
         for vote in ballot.votes:
+            scaled_value = ((vote.value - translate) * scale) + 1
             if vote.entryid in votes_by_user:
-                votes_by_user[vote.entryid].append(vote.value)
+                votes_by_user[vote.entryid].append(scaled_value)
 
     # Average the scores
     scores = []
     for user in votes_by_user.keys():
         if len(votes_by_user[user]) == 0:
-            score = "0"
+            score = "(no votes)"
         else:
             ratio = sum(votes_by_user[user]) / float(len(votes_by_user[user]))
             score = str(round(ratio, 2))
@@ -108,7 +118,7 @@ class AdminPage(webapp2.RequestHandler):
     def newPoll(self):
         new_poll = Poll(title='New Poll')
         new_poll.put()
-        self.editPoll(new_poll.key)
+        return self.redirect("/admin?poll=" + new_poll.key.urlsafe())
 
     def get(self):
         self.parseRequest(self.request.GET)
