@@ -1,5 +1,3 @@
-application: edmpvote
-version: 5
 runtime: python27
 api_version: 1
 threadsafe: true
@@ -8,6 +6,10 @@ handlers:
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
+
+- url: /header\.png
+  static_files: header.png
+  upload: header\.ico
 
 - url: /vote
   script: vote.application

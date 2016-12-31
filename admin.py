@@ -16,7 +16,7 @@ def makePollResults(entries, ballots):
     # Filter out the single-entry ballots
     ballots = filter(lambda ballot: len(ballot.votes) > 1, ballots)
 
-    # Collect the votes
+    # Group the votes by userid
     votes_by_user = {}
     for entry in entries:
         votes_by_user.update({entry.author: []})
