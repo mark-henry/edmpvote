@@ -10,43 +10,69 @@ import datetime
 import re
 
 
-def makePollResults(entries, ballots):
-    """Renders a sorted list of standings"""
-
-    # Filter out the single-entry ballots
-    ballots = filter(lambda ballot: len(ballot.votes) > 1, ballots)
-
-    # Group the votes by userid
-    votes_by_user = {}
+def collate_votes_by_entry(entries, ballots):
+    """
+    Turns a list of entries and a list of ballots into a dict of votes per authorname.
+    """
+    # Also does some complicated dynamic-range scaling.
+    # FIXME: refactor this
+    votes_by_entry = {}
     for entry in entries:
-        votes_by_user.update({entry.author: []})
+        votes_by_entry.update({entry.author: []})
+
     for ballot in ballots:
-        # Normalize each ballot values to a 1-5 scale
+        # Normalize each ballot values to the full scale
         values = [vote.value for vote in ballot.votes]
         if min(values) == max(values):
             continue  # Ballots which express no preference do not count
         translate = min(values)
-        scale = 4.0 / (max(values) - min(values))
+        scale = float(SCORE_RANGE - 1) / (max(values) - min(values))
         for vote in ballot.votes:
             scaled_value = ((vote.value - translate) * scale) + 1
-            if vote.entryid in votes_by_user:
-                votes_by_user[vote.entryid].append(scaled_value)
+            if vote.entryid in votes_by_entry:
+                votes_by_entry[vote.entryid].append(scaled_value)
+
+    return votes_by_entry
+
+def average_score_as_str(vote_values):
+    """Given a list of vote values, render the score string.
+    Score is a float to two decimal places or "(no votes)"
+    """
+    if len(vote_values) == 0:
+        return "(no votes)"
+    else:
+        mean = sum(vote_values) / float(len(vote_values))
+        return str(round(mean, 2))
+
+
+def average_score_per_entry(votes_by_entry):
+    """Returns a list of strings???"""
+    scores = []
+    for user in votes_by_entry.keys():
+        vote_values = votes[user]
+        score = average_score_as_str(votes[user])
+        scores.append(score + " " + user)
+    return scores
+
+
+def renderPollResultsString(entries, ballots):
+    """
+    Renders a sorted list of standings, returns string
+    entries is a list of {author, url} objects
+    ballots is a list of {voterid, votes} objects, where votes is a list of {entriyid, value}
+    """
+    # Filter out the single-entry ballots
+    ballots = filter(lambda ballot: len(ballot.votes) > 1, ballots)
+
+    # Create an entry in a dict for each author name
+    votes_by_entry = collate_votes_by_entry(entries, ballots)
 
     # Average the scores
-    scores = []
-    for user in votes_by_user.keys():
-        if len(votes_by_user[user]) == 0:
-            score = "(no votes)"
-        else:
-            ratio = sum(votes_by_user[user]) / float(len(votes_by_user[user]))
-            score = str(round(ratio, 2))
-        scores.append(score + " " + user)
+    scores = average_score_per_entry(votes_by_entry)
 
-    sortedstandings = []
-    for i, standing in enumerate(sorted(scores, reverse=True)):
-        sortedstandings.append(str(i + 1) + ".  " + standing)
-
-    return "\n".join(sortedstandings)
+    return "\n".join([
+        str(i+1) + ". " + standing
+        for i, standing in enumerate(sorted(scores, reverse=True))])
 
 
 def parse_quickadd(quickadd):
@@ -109,7 +135,7 @@ class AdminPage(webapp2.RequestHandler):
 
         entries = Entry.query(ancestor=poll_key).fetch()
         ballots = Ballot.query(ancestor=poll_key).fetch()
-        results = makePollResults(entries, ballots)
+        results = renderPollResultsString(entries, ballots)
 
         template = JINJA_ENVIRONMENT.get_template('single-poll.html')
         template_vars = {'poll': poll, 'entries': entries, 'ballots': ballots, 'results': results}

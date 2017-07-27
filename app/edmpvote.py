@@ -1,4 +1,4 @@
-"""Datastore models and other common stuff"""
+"""Datastore models and other utilites common to all modules of the app"""
 
 import os
 import logging
@@ -13,7 +13,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'])
 
 DEBUG_MODE = False
-SCORE_RANGE = 10
+SCORE_RANGE = 5
 
 
 def err(args):
