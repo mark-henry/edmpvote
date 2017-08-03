@@ -11,21 +11,21 @@ from app import admin
 
 class TestAdmin(unittest.TestCase):
     def assertBallotScaling(self, ballot, expected):
-        pass
+
 
     def test_renderPollResultsString_empty(self):
         self.assertEqual(
-            admin.renderPollResultsString([], []),
+            admin.calculate_standings_and_render_results_string([]),
             "")
 
     def test_renderPollResultsString_oldscale(self):
         """Assert that a 1-10 ballot is rescaled to a 1-5 range"""
-        ballot = [1, 10]
-        self.assertBallotScaling([1,10], [1,5])
-        self.assertBallotScaling([1,4,10], [1,2,5])
+        self.assertBallotScaling([1, 10], [1, 5])
+        self.assertBallotScaling([1, 4, 10], [1, 2, 5])
 
     def test_renderPollResultsString_dynamicrange(self):
-        """Assert that a scoreset from 1-2 is expanded to a 1-5 range"""
+        """Assert that a scoreset from 1-2 is expanded to the full 1-5 range"""
+        self.assertBallotScaling([1, 2], [1, 5])
         pass
 
     def test_renderPollResultsString_nopreference(self):

@@ -1,5 +1,3 @@
-__author__ = '/u/mark-henry'
-
 from edmpvote import *
 
 from google.appengine.ext import ndb
@@ -9,30 +7,41 @@ import logging
 import datetime
 import re
 
+__author__ = '/u/mark-henry'
 
-def collate_votes_by_entry(entries, ballots):
-    """
-    Turns a list of entries and a list of ballots into a dict of votes per authorname.
-    """
-    # Also does some complicated dynamic-range scaling.
-    # FIXME: refactor this
-    votes_by_entry = {}
-    for entry in entries:
-        votes_by_entry.update({entry.author: []})
 
+def filter_boring_ballots(ballots):
+    return [ballot for ballot in ballots
+            if len(ballot.votes) > 0 and  # filter out empty ballots
+            min(ballot.votes) != max(ballot.votes)  # filter out ballots which express no preferences
+            ]
+
+
+def maximize(votes):
+    """Expands the vote scores to fill the full range of scores.
+    For example, if someone voted only 1s, 2s and 3s, these would be expanded to fill the full 1-5 point range.
+    """
+    scores = [vote.value for vote in votes]
+    translate = min(scores)
+    scale = float(SCORE_RANGE - 1) / (max(scores) - min(scores))
+    for vote in votes:
+        vote.value = ((vote.value - translate) * scale) + 1
+    return votes
+
+
+def collate_scores_by_contestant(ballots):
+    """
+    Turns a list of ballots into a dict of votes per authorname.
+    """
+    ballots = filter_boring_ballots(ballots)
+
+    votes_by_author = {}
     for ballot in ballots:
-        # Normalize each ballot values to the full scale
-        values = [vote.value for vote in ballot.votes]
-        if min(values) == max(values):
-            continue  # Ballots which express no preference do not count
-        translate = min(values)
-        scale = float(SCORE_RANGE - 1) / (max(values) - min(values))
         for vote in ballot.votes:
-            scaled_value = ((vote.value - translate) * scale) + 1
-            if vote.entryid in votes_by_entry:
-                votes_by_entry[vote.entryid].append(scaled_value)
+            votes_by_author[vote.entryid].append(vote.value)
 
-    return votes_by_entry
+    return votes_by_author
+
 
 def average_score_as_str(vote_values):
     """Given a list of vote values, render the score string.
@@ -45,34 +54,23 @@ def average_score_as_str(vote_values):
         return str(round(mean, 2))
 
 
-def average_score_per_entry(votes_by_entry):
-    """Returns a list of strings???"""
-    scores = []
-    for user in votes_by_entry.keys():
-        vote_values = votes[user]
-        score = average_score_as_str(votes[user])
-        scores.append(score + " " + user)
-    return scores
-
-
-def renderPollResultsString(entries, ballots):
+def calculate_standings_and_render_results_string(ballots):
     """
     Renders a sorted list of standings, returns string
     entries is a list of {author, url} objects
     ballots is a list of {voterid, votes} objects, where votes is a list of {entriyid, value}
     """
-    # Filter out the single-entry ballots
-    ballots = filter(lambda ballot: len(ballot.votes) > 1, ballots)
 
-    # Create an entry in a dict for each author name
-    votes_by_entry = collate_votes_by_entry(entries, ballots)
+    for ballot in ballots:
+        ballot.votes = maximize(ballot.votes)
+    scores_by_contestant = collate_scores_by_contestant(ballots)
 
-    # Average the scores
-    scores = average_score_per_entry(votes_by_entry)
+    scores = []
+    for user, votes in scores_by_contestant.items():
+        score = average_score_as_str(votes)
+        scores.append(score + " " + user)
 
-    return "\n".join([
-        str(i+1) + ". " + standing
-        for i, standing in enumerate(sorted(scores, reverse=True))])
+    return "\n".join([str(i + 1) + ". " + standing for i, standing in enumerate(sorted(scores, reverse=True))])
 
 
 def parse_quickadd(quickadd):
@@ -135,7 +133,7 @@ class AdminPage(webapp2.RequestHandler):
 
         entries = Entry.query(ancestor=poll_key).fetch()
         ballots = Ballot.query(ancestor=poll_key).fetch()
-        results = renderPollResultsString(entries, ballots)
+        results = calculate_standings_and_render_results_string(ballots)
 
         template = JINJA_ENVIRONMENT.get_template('single-poll.html')
         template_vars = {'poll': poll, 'entries': entries, 'ballots': ballots, 'results': results}
@@ -178,5 +176,5 @@ class NewEntries(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication(
     [(r'/admin/newentries', NewEntries),
-        (r'/admin.*', AdminPage)],
+     (r'/admin.*', AdminPage)],
     debug=DEBUG_MODE)
