@@ -7,7 +7,6 @@ from google.appengine.ext import ndb
 
 import jinja2
 
-
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'])
@@ -29,7 +28,7 @@ class Entry(ndb.Model):
 class Vote(ndb.Model):
     """Models a entryid-value pair"""
     entryid = ndb.StringProperty('i', required=True)
-    value = ndb.IntegerProperty('v', required=True)
+    value = ndb.FloatProperty('v', required=True)
 
 
 class Ballot(ndb.Model):
@@ -51,10 +50,11 @@ class DefaultPoll(ndb.Model):
       by the vote page when no poll is specified."""
     poll_key = ndb.KeyProperty(kind=Poll)
 
+
 class ReceivingPoll(ndb.Model):
     """
     The singleton ReceivingPoll instance object contains a reference to the
-    currently "receiving" poll, which recieves new entries from /admin/newentries.
+    currently "receiving" poll, which receives new entries from /admin/newentries.
     """
     poll_key = ndb.KeyProperty(kind=Poll)
 

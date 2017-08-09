@@ -1,17 +1,24 @@
-__author__ = '/u/mark-henry'
+import io
+import unittest
 
 import webapp2
 
-import io
-import unittest
 import HTMLTestRunner
-
 from app import admin
+
+__author__ = '/u/mark-henry'
 
 
 class TestAdmin(unittest.TestCase):
-    def assertBallotScaling(self, ballot, expected):
+    def assertMaximize(self, input_scores, expected):
+        id_counter = [0]
 
+        def newid():
+            id_counter[0] += 1
+            return str(id_counter[0])
+
+        actual = admin.maximize({"e" + newid(): score for score in input_scores}).values()
+        self.assertItemsEqual(expected, actual)
 
     def test_renderPollResultsString_empty(self):
         self.assertEqual(
@@ -20,16 +27,26 @@ class TestAdmin(unittest.TestCase):
 
     def test_renderPollResultsString_oldscale(self):
         """Assert that a 1-10 ballot is rescaled to a 1-5 range"""
-        self.assertBallotScaling([1, 10], [1, 5])
-        self.assertBallotScaling([1, 4, 10], [1, 2, 5])
+        self.assertMaximize([1, 10], [1, 5])
+        self.assertMaximize([1, 3, 9], [1, 2, 5])
 
     def test_renderPollResultsString_dynamicrange(self):
         """Assert that a scoreset from 1-2 is expanded to the full 1-5 range"""
-        self.assertBallotScaling([1, 2], [1, 5])
-        pass
+        self.assertMaximize([1, 2], [1, 5])
 
     def test_renderPollResultsString_nopreference(self):
         """Assert that a scoreset containing all 5 scores is equivalent to expressing no preference"""
+        pass
+
+    def test_None_value_ignored(self):
+        # self.assertMaximize([1, 2, None], [1, 5])
+        pass
+
+    def test_trivial_ballots_filtered(self):
+        """Test that boring ballots which express no preferences are ignored"""
+        # assert empty ballot filtered
+        # assert ballot with only one vote filtered
+        # assert ballot with all of one value is filtered
         pass
 
 
