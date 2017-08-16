@@ -18,7 +18,7 @@ div {
 }
 
 img {
-  border: 0px;
+  border: 0;
 }
 
 #content {
@@ -90,9 +90,14 @@ span.score_link:hover {
   background: #00B4FF;
 }
 
-.sc_player {
+.player {
   height: 177px;
   padding: 4px;
   border: 1px solid #ccc;
   margin-top: 5px;
+}
+
+.clyp_player iframe {
+  width: 100%;
+  height: 100%;
 }

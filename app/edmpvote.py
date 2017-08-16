@@ -28,7 +28,7 @@ class Entry(ndb.Model):
 class Vote(ndb.Model):
     """Models a entryid-value pair"""
     entryid = ndb.StringProperty('i', required=True)
-    value = ndb.FloatProperty('v', required=True)
+    value = ndb.IntegerProperty('v', required=True)
 
 
 class Ballot(ndb.Model):
