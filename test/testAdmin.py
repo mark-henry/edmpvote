@@ -34,24 +34,23 @@ class TestAdmin(unittest.TestCase):
         """Assert that a scoreset from 1-2 is expanded to the full 1-5 range"""
         self.assertMaximize([1, 2], [1, 5])
 
-    def test_renderPollResultsString_nopreference(self):
-        """Assert that a scoreset containing all 5 scores is equivalent to expressing no preference"""
-        pass
-
     def test_None_value_ignored(self):
         # self.assertMaximize([1, 2, None], [1, 5])
         pass
 
     def test_trivial_ballots_filtered(self):
         """Test that boring ballots which express no preferences are ignored"""
-        # assert empty ballot filtered
-        # assert ballot with only one vote filtered
-        # assert ballot with all of one value is filtered
-        pass
+        def assertFiltered(ballot, msg):
+            self.assertListEqual([], admin.filter_boring_ballots([ballot]), msg)
+
+        assertFiltered({}, "Empty ballot should be filtered")
+        assertFiltered({'a':1}, "Ballot of only one value should be filtered")
+        assertFiltered({'a':5, 'b':5, 'c':5}, "Ballot all of one value should be filtered")
 
 
 class TestRunner(webapp2.RequestHandler):
-    def html_test(self):
+    @staticmethod
+    def html_test():
         suite = unittest.TestLoader().loadTestsFromTestCase(TestAdmin)
         # unittest.TextTestRunner(verbosity=2).run(suite)
 

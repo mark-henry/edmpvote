@@ -13,7 +13,7 @@ __author__ = '/u/mark-henry'
 def filter_boring_ballots(ballots):
     return [
         ballot for ballot in ballots
-        if len(ballot) > 0 and  # filter out empty ballots
+        if len(ballot) > 1 and  # filter out empty ballots and one-vote ballots
         min(ballot.values()) != max(ballot.values())  # filter out ballots which express no preferences
         ]
 
