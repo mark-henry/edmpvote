@@ -21,6 +21,10 @@
       margin-left: 10px;
     }
   </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script>
+    $("#quickadd").oninput(function() {alert("ey")})
+  </script>
 </head>
 <body>
   <a href="/admin?view=polls">&lt;&lt;Back to polls list</a>
@@ -49,7 +53,7 @@
   <form method="post" action="">
     <input type="hidden" name="poll" value="{{ poll.key.urlsafe() }}">
     <span>
-      <textarea style="width:500px" type="text" name="quickadd" placeholder="Quick Add"></textarea>
+      <textarea id="quickadd" style="width:500px" type="text" name="quickadd" placeholder="Quick Add"></textarea>
       <input style="vertical-align:top" type="submit" value="Create New Entry">
     </span>
   </form>

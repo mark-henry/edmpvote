@@ -25,7 +25,6 @@ def getBallot(poll, voterid):
         return ballot[0]
     else:
         newballot = Ballot(parent=poll.key, voterid=voterid)
-        newballot.put()
         return newballot
 
 

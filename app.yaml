@@ -3,23 +3,21 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /favicon\.ico
-  static_files: favicon.ico
-  upload: favicon\.ico
+- url: /vote
+  script: app.vote.application
 
+- url: /admin/test
+  script: test.testAdmin.application
+  login: admin
+  
+- url: /admin.*
+  script: app.admin.application
+  login: admin
+
+# misc files
 - url: /header\.png
   static_files: header.png
   upload: header\.ico
-
-- url: /vote
-  script: vote.application
-
-- url: /admin/newentries
-  script: admin.application
-  
-- url: /admin.*
-  script: admin.application
-  login: admin
 
 - url: /stylesheets
   static_dir: stylesheets
@@ -27,8 +25,13 @@ handlers:
 - url: /images
   static_dir: images
 
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+# Default case: serve the homepage
 - url: /.*
-  script: vote.application
+  script: app.vote.application
 
 libraries:
 - name: webapp2

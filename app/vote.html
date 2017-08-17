@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<!-- Main voting page by /u/mark-henry -->
+<!-- Based on original voting page by /u/rxi -->
+<!-- Displays list of contest entries and buttons to vote with -->
+
+{% autoescape true %}
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://connect.soundcloud.com/sdk/sdk-3.1.2.js"></script>
+    <script>
+        $(document).ready(function () {
+            SC.initialize({
+                client_id: "bc17f4f5b116521473dbe01f2d405112",
+            });
+
+            // Load track titles
+            $(".entrytitle").each(function () {
+                var titleElement = $(this);
+                var url = titleElement.attr("href");
+                if (url.indexOf("soundcloud.com") != -1) {
+                    SC.get("/resolve?url=" + url)
+                        .then(function (track) {
+                            titleElement.text(track.title);
+                        });
+                } else if (url.indexOf("clyp.it") != -1) {
+                    $.get(
+                        url.replace("clyp.it", "api.clyp.it"),
+                        {},
+                        function handle_response(response) {
+                            titleElement.text(response.Title);
+                        }
+                    )
+                }
+            });
+
+            // Load SC embeds
+            $(".sc_player").each(function () {
+                var url = $(this).attr("url");
+                SC.oEmbed(url, {
+                    maxheight: 177,
+                    show_playcount: false,
+                    show_artwork: false,
+                    show_comments: false,
+                    buying: false,
+                    sharing: false,
+                    auto_play: false,
+                    element: this
+                });
+            });
+
+            // On clicking a score link
+            $(".score_link").click(function () {
+                // Change highlighting of score links
+                $(this).siblings().removeClass("score_link_active");
+                $(this).addClass("score_link_active");
+
+                // Send in the vote
+                var entryid = $(this).parent().siblings().filter(".author").text();
+                $.post("vote",
+                    {
+                        poll: "{{poll_key}}",
+                        entryid: entryid,
+                        score: $(this).text()
+                    },
+                    function (data, status) {
+                        if (status != "success") {
+                            alert("There was an error registering your vote. Please refresh the page and try again.");
+                        }
+                    });
+            });
+        });
+    </script>
+    <title>{{ poll_title }}</title>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
+</head>
+
+<body>
+<div id="header">
+    <a href="http://www.reddit.com/r/edmproduction/">
+        <img src="images/header.png"/>
+    </a>
+</div>
+<div id="content">
+    {% for entry in entries %}
+    <div class="entry">
+        <span class="title"><a class="entrytitle" href="{{ entry.url }}">...</a></span>
+        <span class="author">{{ entry.author }}</span>
+
+        {% if "soundcloud.com" in entry.url %}
+        <div class="player sc_player" url="{{ entry.url }}"></div>
+        {% elif "clyp.it" in entry.url %}
+        <div class="player clyp_player" url="{{ entry.url }}">
+            <iframe src="{{ entry.url + '/widget' }}" frameborder=0"></iframe>
+        </div>
+        {% endif %}
+
+        {% if voting_enabled %}
+        <div class="score_links">
+            {% for score in range(1, SCORE_RANGE+1) %}
+            {% if entry.entryid in ballot and score == ballot[entry.entryid] %}
+            {# Highlight the link if the user has given this score to this entry #}
+            <a class="score_link score_link_active" href="#">{{ score }}</a>
+            {% else %}
+            <a class="score_link" href="javascript:void(0)">{{ score }}</a>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+<div id="footer">
+    <img src="https://developers.google.com/appengine/images/appengine-silver-120x30.gif"
+         alt="Powered by Google App Engine"/>
+    <br>
+    <a href="http://www.reddit.com/message/compose?to=mark-henry">Report issues to /u/mark-henry</a>
+</div>
+</body>
+</html>
+{% endautoescape %}

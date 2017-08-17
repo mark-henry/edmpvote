@@ -1,4 +1,4 @@
-"""Datastore models and other common stuff"""
+"""Datastore models and other utilites common to all modules of the app"""
 
 import os
 import logging
@@ -7,13 +7,12 @@ from google.appengine.ext import ndb
 
 import jinja2
 
-
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'])
 
 DEBUG_MODE = False
-SCORE_RANGE = 10
+SCORE_RANGE = 5
 
 
 def err(args):
@@ -51,10 +50,11 @@ class DefaultPoll(ndb.Model):
       by the vote page when no poll is specified."""
     poll_key = ndb.KeyProperty(kind=Poll)
 
+
 class ReceivingPoll(ndb.Model):
     """
     The singleton ReceivingPoll instance object contains a reference to the
-    currently "receiving" poll, which recieves new entries from /admin/newentries.
+    currently "receiving" poll, which receives new entries from /admin/newentries.
     """
     poll_key = ndb.KeyProperty(kind=Poll)
 
