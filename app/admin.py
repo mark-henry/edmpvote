@@ -140,7 +140,7 @@ class AdminPage(webapp2.RequestHandler):
         ballots = Ballot.query(ancestor=poll_key).fetch()
 
         def add_entry(author, url):
-            duplicate_entry = next(entry for entry in entries if entry.author == author)
+            duplicate_entry = next((entry for entry in entries if entry.author == author), None)
             if not duplicate_entry:
                 new_entry = Entry(author=author, url=url, parent=poll_key)
                 entries.append(new_entry)
