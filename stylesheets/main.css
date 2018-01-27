@@ -65,6 +65,12 @@ img {
   display: flex;
 }
 
+.score_link.score_link_active {
+  color: #FFFFFF;
+  background: #00B4FF;
+  font-weight: bold;
+}
+
 .score_link {
   color: #292929;
   background: #e4e4e4;
@@ -77,12 +83,6 @@ img {
 
 .score_link:hover {
   background: #afb4c1;
-}
-
-.score_link_active {
-  color: #FFFFFF;
-  background: #00B4FF;
-  font-weight: bold;
 }
 
 span.score_link:hover {

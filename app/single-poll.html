@@ -20,6 +20,9 @@
     body {
       margin-left: 10px;
     }
+    .alert {
+      background: orange;
+    }
   </style>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script>
@@ -63,6 +66,11 @@
     <input type="text" name="url" placeholder="Soundcloud URL">
     <input type="submit" value="Create New Entry">
   </form>
+  
+  {% for message in messages %}
+    <div class="alert">{{message}}</div>
+  {% endfor %}
+
   <p>{{ entries|count }} entries:</p>
   <table border="1">
     <tr><td>Author</td><td>URL</td></tr>
