@@ -132,8 +132,23 @@ class AdminPage(webapp2.RequestHandler):
         self.response.write(template.render(template_vars))
 
     def edit_poll(self, poll_key):
+        messages = []  # alerts to display to the user on the finished page
         queries = self.request.POST
         poll = poll_key.get()
+
+        entries = Entry.query(ancestor=poll_key).fetch()
+        ballots = Ballot.query(ancestor=poll_key).fetch()
+
+        def add_entry(author, url):
+            duplicate_entry = next(entry for entry in entries if entry.author == author)
+            if not duplicate_entry:
+                new_entry = Entry(author=author, url=url, parent=poll_key)
+                entries.append(new_entry)
+                new_entry.put()
+            else:
+                messages.append('Updated ' + str(duplicate_entry) + ' with new url ' + url)
+                duplicate_entry.url = url
+                duplicate_entry.put()
 
         if 'title' in queries:
             poll.title = queries['title']
@@ -145,18 +160,17 @@ class AdminPage(webapp2.RequestHandler):
                 poll.voting_enabled = False
             poll.put()
         if 'author' in queries and 'url' in queries:
-            Entry(author=queries['author'], url=queries['url'], parent=poll_key).put()
+            add_entry(queries['author'], queries['url'])
         if 'quickadd' in queries:
             author, url = parse_quickadd(queries['quickadd'])
             if author and url:
-                Entry(author=author, url=url, parent=poll_key).put()
+                add_entry(author, url)
 
-        entries = Entry.query(ancestor=poll_key).fetch()
-        ballots = Ballot.query(ancestor=poll_key).fetch()
         results = calculate_standings_and_render_results_string(ballots)
 
         template = JINJA_ENVIRONMENT.get_template('single-poll.html')
-        template_vars = {'poll': poll, 'entries': entries, 'ballots': ballots, 'results': results}
+        template_vars = {'poll': poll, 'entries': entries, 'ballots': ballots,
+            'results': results, 'messages': messages}
         self.response.write(template.render(template_vars))
 
     def new_poll(self):
