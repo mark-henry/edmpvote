@@ -33,6 +33,12 @@
                             titleElement.text(response.Title);
                         }
                     )
+                } else if (url.indexOf("youtube.com") != -1 ||
+                    url.indexOf("youtu.be") != -1) {
+                    $.get(url, {},
+                        function handle_response(response) {
+                            titleElement.text(/"title":"(.*?)"/.exec(response)[1]);
+                        });
                 }
             });
 
@@ -50,6 +56,16 @@
                     element: this
                 });
             });
+
+            // Load YouTube embeds
+            $(".youtube_player").each(function() {
+                function getYouTubeId(url) {
+                    var match = /youtu\.be\/(.*)|youtube.com\/watch\?v=(.*)/.exec(url);
+                    return match[1] || match[2];
+                }
+                var id = getYouTubeId(this.getAttribute("url"));
+                $(this).append('<iframe src="https://www.youtube.com/embed/' + id + '?origin=https://edmpvote.appspot.com frameborder="0"></iframe>');
+            })
 
             // On clicking a score link
             $(".score_link").click(function () {
@@ -93,8 +109,10 @@
         <div class="player sc_player" url="{{ entry.url }}"></div>
         {% elif "clyp.it" in entry.url %}
         <div class="player clyp_player" url="{{ entry.url }}">
-            <iframe src="{{ entry.url + '/widget' }}" frameborder=0"></iframe>
+            <iframe src="{{ entry.url + '/widget' }}" frameborder=0></iframe>
         </div>
+        {% elif "youtu" in entry.url %}
+        <div class="player youtube_player" url="{{ entry.url }}"></div>
         {% endif %}
 
         {% if voting_enabled %}

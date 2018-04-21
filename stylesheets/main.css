@@ -101,3 +101,9 @@ span.score_link:hover {
   width: 100%;
   height: 100%;
 }
+
+.youtube_player iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
