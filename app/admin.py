@@ -96,7 +96,7 @@ def calculate_standings_and_render_results_string(ballots):
 def parse_quickadd(quickadd):
     url_match = re.search('https?:.*?(?=(\s|$))', quickadd)
     url = url_match.group(0) if url_match else ""
-    
+
     username_match = re.search('from ([\w-]+)', quickadd)
     if username_match:
         username = username_match.group(1)
@@ -148,8 +148,9 @@ class AdminPage(webapp2.RequestHandler):
                 new_entry = Entry(author=author, url=url, parent=poll_key)
                 entries.append(new_entry)
                 new_entry.put()
+                messages.append('Added entry ' + str(new_entry))
             else:
-                messages.append('Updated ' + str(duplicate_entry) + ' with new url ' + url)
+                messages.append('Replaced ' + str(duplicate_entry) + ' with new url ' + url)
                 duplicate_entry.url = url
                 duplicate_entry.put()
 
