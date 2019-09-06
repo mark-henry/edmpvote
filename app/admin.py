@@ -95,11 +95,11 @@ def calculate_standings_and_render_results_string(ballots):
 
 def parse_quickadd(quickadd):
     url = re.search('https?:.*?(?=(\s|$))', quickadd).group(0)
-    from_match = re.search('from (\w*)', quickadd)
-    if from_match:
-        username = from_match.group(1)
+    submitter_name_match = re.search('from ([\w-]+)', quickadd)
+    if submitter_name_match:
+        username = submitter_name_match.group(1)
     else:
-        username = re.search('\w*', quickadd).group(0)
+        username = re.search('[\w-]+', quickadd).group(0)
     return (username, url)
 
 
