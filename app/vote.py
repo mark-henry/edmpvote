@@ -15,6 +15,14 @@ def getVoterID():
     """Gets a string that identifies the voter."""
     # Right now it's just their IP address
     client_ip = os.getenv("REMOTE_ADDR")
+
+    # If this is a developer sumitting ballots in a local testing environment, the ip address will be:
+    localhost = "::1"
+    # When testing locally, we frequently want to generate a lot of ballots for testing,
+    # so here we mess with the voter id to help create a variety of ballots
+    if client_ip == localhost:
+        client_ip = str(random.randrange(5))
+
     return client_ip
 
 
@@ -89,8 +97,6 @@ class VotePage(webapp2.RequestHandler):
     def post(self):
         queries = self.request.POST
         voterid = getVoterID()
-
-        # err("Received POST " + str(queries))
 
         if not ('poll' in queries and 'entryid' in queries and 'score' in queries):
             self.response.write(self.response.http_status_message(400))

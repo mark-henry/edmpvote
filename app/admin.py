@@ -15,7 +15,7 @@ def filter_boring_ballots(ballots):
         ballot for ballot in ballots
         if len(ballot) > 1 and  # filter out empty ballots and one-vote ballots
         min(ballot.values()) != max(ballot.values())  # filter out ballots which express no preferences
-        ]
+    ]
 
 
 def maximize(ballot):
@@ -33,15 +33,15 @@ def maximize(ballot):
     return ballot
 
 
-def collate_scores_by_contestant(ballots):
+def group_scores_by_author(ballots):
     """
     Turns a list of ballots into a dict of votes per authorname.
     """
     votes_by_author = defaultdict(list)
     for ballot in ballots:
-        for contestant, score in ballot.items():
-            print votes_by_author[contestant]
-            votes_by_author[contestant].append(score)
+        for authorname, score in ballot.items():
+            authorname = authorname.strip() # Some votes are coming in with whitespace added to the author name...
+            votes_by_author[authorname].append(score)
 
     return votes_by_author
 
@@ -73,20 +73,20 @@ def flatten_ballots(ballots):
 
 def calculate_standings_and_render_results_string(ballots):
     """
+    Given the list of ballots, creates the string representing the results list for display
     :rtype: string
     :type ballots: list
     :param ballots: list of Ballot objects
     :return: standings for display to the user
     """
-
     ballots_flat = flatten_ballots(ballots)
     ballots_flat = filter_boring_ballots(ballots_flat)
     for ballot in ballots_flat:
         maximize(ballot)
-    scores_by_contestant = collate_scores_by_contestant(ballots_flat)
+    scores_grouped_by_author = group_scores_by_author(ballots_flat)
 
     scores = []
-    for user, votes in scores_by_contestant.items():
+    for user, votes in scores_grouped_by_author.items():
         score = average_score_as_str(votes)
         scores.append(score + " " + user)
 
