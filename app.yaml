@@ -29,6 +29,10 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+# gRPC endpoints
+- url: /GetService.*
+  script: services.app
+
 # Default case: serve the homepage
 - url: /.*
   script: app.vote.application

@@ -7,6 +7,10 @@ from google.appengine.ext import ndb
 
 import jinja2
 
+from protorpc import messages
+from protorpc import message_types
+from protorpc import remote
+
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'])
@@ -83,3 +87,36 @@ def getReceivingPollObject():
         receiving_poll = ReceivingPoll()
         receiving_poll.poll_key = getDefaultPollObject().poll_key
         return receiving_poll
+
+
+
+# NEW CODE - Adds a Get Entries endpoint via RPC - Import the postman_collection.json into the postman app to test
+
+class Submission(messages.Message):
+    author = messages.StringField(1, required=True)
+    url = messages.StringField(2, required=True)
+
+class Request(messages.Message):
+    author = messages.StringField(1, required=False)
+
+class Response(messages.Message):
+    entries = messages.MessageField(Submission, 1, repeated=True)
+
+class GetService(remote.Service):
+
+    # Add the remote decorator to indicate the service methods
+    @remote.method(Request, Response)
+    def entries(self, request):
+
+        if request.author:
+            entries = Entry.query(Entry.author == request.author).fetch()
+        else:
+            entries = Entry.query().fetch()
+
+        response = Response()
+
+        for entry in entries:
+            entry = Submission(author=entry.author, url=entry.url)
+            response.entries.append(entry)
+ 
+        return response
