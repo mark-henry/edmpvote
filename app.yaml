@@ -30,7 +30,13 @@ handlers:
   upload: favicon\.ico
 
 # gRPC endpoints
-- url: /GetService.*
+- url: /entries.*
+  script: services.app
+
+- url: /polls.*
+  script: services.app
+
+- url: /ballots.*
   script: services.app
 
 # Default case: serve the homepage

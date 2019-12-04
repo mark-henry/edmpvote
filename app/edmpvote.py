@@ -92,31 +92,105 @@ def getReceivingPollObject():
 
 # NEW CODE - Adds a Get Entries endpoint via RPC - Import the postman_collection.json into the postman app to test
 
-class Submission(messages.Message):
+class EntriesModel(messages.Message):
     author = messages.StringField(1, required=True)
     url = messages.StringField(2, required=True)
 
-class Request(messages.Message):
+class EntriesRequest(messages.Message):
     author = messages.StringField(1, required=False)
 
-class Response(messages.Message):
-    entries = messages.MessageField(Submission, 1, repeated=True)
+class EntriesResponse(messages.Message):
+    entries = messages.MessageField(EntriesModel, 1, repeated=True)
 
-class GetService(remote.Service):
+class EntryRequest(messages.Message):
+    author = messages.StringField(1, required=False)
+    url = messages.StringField(2, required=True)
+
+class EntryResponse(messages.Message):
+    entry = messages.MessageField(EntriesModel, 1)
+
+class Entries(remote.Service):
 
     # Add the remote decorator to indicate the service methods
-    @remote.method(Request, Response)
-    def entries(self, request):
+    @remote.method(EntriesRequest, EntriesResponse)
+    def get(self, request):
 
         if request.author:
             entries = Entry.query(Entry.author == request.author).fetch()
         else:
             entries = Entry.query().fetch()
 
-        response = Response()
+        response = EntriesResponse()
 
         for entry in entries:
-            entry = Submission(author=entry.author, url=entry.url)
+            entry = EntriesModel(author=entry.author, url=entry.url)
             response.entries.append(entry)
+ 
+        return response
+
+    # Add the remote decorator to indicate the service methods
+    @remote.method(EntryRequest, EntryResponse)
+    def post(self, request):
+
+        entry = Entry(author=request.author, url=request.url, parent=getReceivingPollObject().poll_key).put()
+
+        response = EntryResponse()
+
+        response.entry = EntriesModel(author=request.author, url=request.url)
+
+        return response
+
+
+class PollsModel(messages.Message):
+    title = messages.StringField(1, required=True)
+    votingEnabled = messages.BooleanField(2, required=True)
+
+class PollsRequest(messages.Message):
+    votingEnabled = messages.BooleanField(1, required=False)
+    
+class PollsResponse(messages.Message):
+    polls = messages.MessageField(PollsModel, 1, repeated=True)
+
+class Polls(remote.Service):
+
+    # Add the remote decorator to indicate the service methods
+    @remote.method(PollsRequest, PollsResponse)
+    def get(self, request):
+
+        polls = Poll.query().fetch()
+
+        response = PollsResponse()
+
+        for poll in polls:
+            poll = PollsModel(title=poll.title, votingEnabled=poll.voting_enabled)
+            response.polls.append(poll)
+ 
+        return response
+        
+
+class BallotsModel(messages.Message):
+    entry = messages.StringField(1, required=True)
+    vote = messages.IntegerField(2, required=True)
+
+class BallotsRequest(messages.Message):
+    pollId = messages.StringField(1, required=False)
+    
+class BallotsResponse(messages.Message):
+    ballots = messages.MessageField(BallotsModel, 1, repeated=True)
+
+class Ballots(remote.Service):
+
+    # Add the remote decorator to indicate the service methods
+    @remote.method(BallotsRequest, BallotsResponse)
+    def get(self, request):
+
+        ballots = Ballot.query(ancestor=getReceivingPollObject().poll_key).fetch()
+
+        response = BallotsResponse()
+
+        for ballot in ballots:
+            for vote in ballot.votes:
+                ballot = BallotsModel(entry=vote.entryid, vote=vote.value)
+                response.ballots.append(ballot)
  
         return response
